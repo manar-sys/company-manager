@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CompanyDTO;
 import com.example.demo.entity.Company;
 import com.example.demo.service.CompanyService;
 
@@ -34,8 +35,7 @@ public class CompanyController {
 
     // N+1 ÇÖZÜLMÜŞ LİSTELEME (Performanslı hali)
     @GetMapping("/optimized")
-    public List<Company> getAllOptimized() {
-        // JOIN FETCH kullandığımız servisi çağırır
-        return companyService.getAllCompaniesWithDetails();
+    public ResponseEntity<List<CompanyDTO>> getCompaniesOptimized() {
+        return ResponseEntity.ok(companyService.getAllCompaniesWithDetails());
     }
 }

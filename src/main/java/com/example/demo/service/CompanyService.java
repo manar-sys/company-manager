@@ -1,9 +1,13 @@
 package com.example.demo.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.dto.CompanyDTO;
+import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.entity.Company;
 import com.example.demo.repository.CompanyRepository;
 
@@ -22,10 +26,31 @@ public class CompanyService {
     }
 
     // N+1 Çözümlü liste getirme
-    public List<Company> getAllCompaniesWithDetails() {
-        // Repository'de yazdığımız JOIN FETCH metodu burada çağrılır
-        return companyRepository.findAllWithDetails();
-    }
+   @Transactional(readOnly = true)
+    public List<CompanyDTO> getAllCompaniesWithDetails() {
+        // JOIN FETCH kullanan
+        List<Company> companies = companyRepository.findAllWithDetails();
+
+        return companies.stream().map(company -> {
+            CompanyDTO dto = new CompanyDTO();
+            dto.setId(company.getId());
+            dto.setName(company.getName());
+            dto.setBudget(company.getBudget());
+            
+            // DTO içinde EmployeeDTO listesi oluşturup dolduruyoruz
+            if (company.getEmployees() != null) {
+                dto.setEmployees(company.getEmployees().stream().map(emp -> {
+                    EmployeeDTO eDto = new EmployeeDTO();
+                    eDto.setId(emp.getId());
+                    eDto.setFirstName(emp.getFirstName());
+                    eDto.setLastName(emp.getLastName());
+                    eDto.setSalary(emp.getSalary());
+                    return eDto;
+                }).collect(Collectors.toList()));
+            }
+            return dto;
+        }).collect(Collectors.toList());
+}
 
     public Company createCompany(Company company) {
         // Gelen verinin boş olup olmadığını kontrol et

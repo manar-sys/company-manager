@@ -1,7 +1,5 @@
 package com.example.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -19,7 +17,7 @@ public class Employee extends BaseEntity {
 
     @ManyToOne (fetch=FetchType.LAZY)
     @JoinColumn(name = "company_id")
-    @JsonIgnore
+
     private Company company;
     
 }
