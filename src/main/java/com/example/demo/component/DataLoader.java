@@ -1,5 +1,6 @@
 package com.example.demo.component;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.springframework.boot.CommandLineRunner;
@@ -26,44 +27,40 @@ public class DataLoader implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        
-        
+
         Admin admin = new Admin();
         admin.setUsername("manar");
         admin.setEmail("admin@company.com");
         adminRepository.save(admin);
 
-       
         Company techCorp = new Company();
         techCorp.setName("Tech Corp");
-        techCorp.setBudget(500000.0);
-        techCorp.setAdmin(admin); 
+        techCorp.setBudget(BigDecimal.valueOf(500000));
+        techCorp.setAdmin(admin);
 
         Company creativeAgency = new Company();
         creativeAgency.setName("Creative Agency");
-        creativeAgency.setBudget(200000.0);
+        creativeAgency.setBudget(BigDecimal.valueOf(200000));
         creativeAgency.setAdmin(admin);
 
         companyRepository.saveAll(Arrays.asList(techCorp, creativeAgency));
 
-       
         Employee emp1 = new Employee();
         emp1.setFirstName("Ali");
         emp1.setLastName("Kaya");
-        emp1.setSalary(10000.0);
+        emp1.setSalary(BigDecimal.valueOf(10000));
         emp1.setCompany(techCorp);
 
         Employee emp2 = new Employee();
         emp2.setFirstName("Ayşe");
         emp2.setLastName("Yılmaz");
-        emp2.setSalary(12000.0);
+        emp2.setSalary(BigDecimal.valueOf(12000));
         emp2.setCompany(techCorp);
 
-        
         Employee emp3 = new Employee();
         emp3.setFirstName("Can");
         emp3.setLastName("Demir");
-        emp3.setSalary(8000.0);
+        emp3.setSalary(BigDecimal.valueOf(8000));
         emp3.setCompany(creativeAgency);
 
         employeeRepository.saveAll(Arrays.asList(emp1, emp2, emp3));

@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -14,8 +15,7 @@ import lombok.Setter;
 @Getter @Setter
 public class Company extends BaseEntity {
     private String name;
-    private double budget;
-
+    private BigDecimal budget;
     @OneToMany (mappedBy = "company", fetch=FetchType.LAZY)
     private List<Employee> employees;
     

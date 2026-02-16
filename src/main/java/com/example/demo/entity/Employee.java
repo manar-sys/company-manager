@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -13,7 +15,7 @@ public class Employee extends BaseEntity {
     private String firstName;
     private String lastName;
     private String position;
-    private double salary;
+    private BigDecimal salary;
 
     @ManyToOne (fetch=FetchType.LAZY)
     @JoinColumn(name = "company_id")

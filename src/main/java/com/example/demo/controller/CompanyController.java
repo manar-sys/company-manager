@@ -13,29 +13,37 @@ import com.example.demo.dto.CompanyDTO;
 import com.example.demo.entity.Company;
 import com.example.demo.service.CompanyService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/companies")
 @RequiredArgsConstructor
 public class CompanyController {
+
     private final CompanyService companyService;
-    
+
     @PostMapping
-    public ResponseEntity<Company> create(@RequestBody Company company) {
-        return ResponseEntity.ok(companyService.createCompany(company));
+    public ResponseEntity<CompanyDTO> create(
+            @Valid @RequestBody CompanyDTO companyDTO) {
+
+        return ResponseEntity.ok(
+                companyService.createCompany(companyDTO)
+        );
     }
 
-    // N+1 PROBLEMLİ LİSTELEME (Bunu problemi gözlemlemek için kullan)
+    // فقط لعرض مشكلة N+1 (Entity يرجع)
     @GetMapping("/n-plus-one-test")
     public List<Company> getAllWithProblem() {
-        // Bu metod repository'deki standart findAll()'u kullanırsa konsolda N+1 sorgu görürsün
-        return companyService.getAllStandard(); 
+        return companyService.getAllStandard();
     }
 
-    // N+1 ÇÖZÜLMÜŞ LİSTELEME (Performanslı hali)
+    // النسخة المحسنة
     @GetMapping("/optimized")
     public ResponseEntity<List<CompanyDTO>> getCompaniesOptimized() {
-        return ResponseEntity.ok(companyService.getAllCompaniesWithDetails());
+        return ResponseEntity.ok(
+                companyService.getAllCompaniesWithDetails()
+        );
     }
 }
