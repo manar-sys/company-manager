@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Company Manager</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+
+        h1, h2 {
+            margin-bottom: 15px;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        input {
+            padding: 8px;
+            margin-right: 10px;
+            width: 180px;
+        }
+
+        button {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+
+        .actions button {
+            margin-right: 5px;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Company Manager</h1>
+
+<div id="error" class="error"></div>
+
+<h2>Add Company</h2>
+<form id="companyForm">
+    <input type="text" id="name" placeholder="Company Name" required />
+    <input type="number" id="budget" placeholder="Budget" required />
+    <button type="submit">Save</button>
+</form>
+
+<h2>Company List</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Budget</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="companyTable"></tbody>
+</table>
+
+<script>
+
+const API_URL = "http://localhost:8080/companies";
+
+function showError(message) {
+    document.getElementById("error").innerText = message;
+}
+
+function clearError() {
+    document.getElementById("error").innerText = "";
+}
+
+function loadCompanies() {
+    fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+            const table = document.getElementById("companyTable");
+            table.innerHTML = "";
+
+            data.content.forEach(company => {
+                const row = `
+                    <tr>
+                        <td>${company.id}</td>
+                        <td>${company.name}</td>
+                        <td>${company.budget}</td>
+                        <td class="actions">
+                            <button onclick="editCompany(${company.id}, '${company.name}', ${company.budget})">Edit</button>
+                            <button onclick="deleteCompany(${company.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                table.innerHTML += row;
+            });
+        })
+        .catch(() => showError("Failed to load companies"));
+}
+
+document.getElementById("companyForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    clearError();
+
+    const name = document.getElementById("name").value;
+    const budget = document.getElementById("budget").value;
+
+    fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, budget })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+    })
+    .then(() => {
+        loadCompanies();
+        document.getElementById("companyForm").reset();
+    })
+    .catch(() => showError("Validation or server error"));
+});
+
+function editCompany(id, currentName, currentBudget) {
+    const newName = prompt("New name:", currentName);
+    const newBudget = prompt("New budget:", currentBudget);
+
+    if (!newName || !newBudget) return;
+
+    fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName, budget: newBudget })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+    })
+    .then(() => loadCompanies())
+    .catch(() => showError("Update failed"));
+}
+
+function deleteCompany(id) {
+    fetch(`${API_URL}/${id}`, { method: "DELETE" })
+        .then(res => {
+            if (!res.ok) throw new Error();
+            loadCompanies();
+        })
+        .catch(() => showError("Delete failed"));
+}
+
+loadCompanies();
+
+</script>
+
+</body>
+</html>
