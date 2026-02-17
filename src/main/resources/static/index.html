@@ -83,7 +83,7 @@
 </table>
 
 <script>
-
+let editingId = null;
 const API_URL = "http://localhost:8080/companies";
 
 function showError(message) {
@@ -126,8 +126,11 @@ document.getElementById("companyForm").addEventListener("submit", function(e) {
     const name = document.getElementById("name").value;
     const budget = document.getElementById("budget").value;
 
-    fetch(API_URL, {
-        method: "POST",
+    const method = editingId ? "PUT" : "POST";
+    const url = editingId ? `${API_URL}/${editingId}` : API_URL;
+
+    fetch(url, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, budget })
     })
@@ -138,25 +141,15 @@ document.getElementById("companyForm").addEventListener("submit", function(e) {
     .then(() => {
         loadCompanies();
         document.getElementById("companyForm").reset();
+        editingId = null;
     })
     .catch(() => showError("Validation or server error"));
 });
 
 function editCompany(id, currentName, currentBudget) {
-    const newName = currentName + " Updated";
-    const newBudget = currentBudget;
-
-    fetch(`${API_URL}/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newName, budget: newBudget })
-    })
-    .then(res => {
-        if (!res.ok) throw new Error();
-        return res.json();
-    })
-    .then(() => loadCompanies())
-    .catch(() => showError("Update failed"));
+    document.getElementById("name").value = currentName;
+    document.getElementById("budget").value = currentBudget;
+    editingId = id;
 }
 
 function deleteCompany(id) {

@@ -13,9 +13,12 @@ test('create → list → update → delete company', async ({ page }) => {
   await expect(page.locator('text=Playwright Company')).toBeVisible();
 
   // UPDATE
-  await page.locator('text=Edit').last().click();
+    await page.locator('text=Edit').last().click();
 
-  await expect(page.locator('text=Playwright Company Updated')).toBeVisible();
+    await page.fill('#name', 'Playwright Company Updated');
+    await page.click('button[type="submit"]');
+
+    await expect(page.locator('text=Playwright Company Updated')).toBeVisible();
 
   // DELETE
   await page.locator('text=Delete').last().click();
