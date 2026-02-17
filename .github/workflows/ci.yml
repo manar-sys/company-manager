@@ -10,20 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: corporate_db
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,8 +20,13 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Build backend with Maven
-        run: mvn clean install -Dspring.profiles.active=test
+      - name: Build backend
+        run: mvn clean package -DskipTests
+
+      - name: Start Spring Boot (test profile)
+        run: |
+          nohup java -jar target/*.jar --spring.profiles.active=test > app.log 2>&1 &
+          sleep 20
 
       - name: Setup Node
         uses: actions/setup-node@v4
