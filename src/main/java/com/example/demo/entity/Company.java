@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -16,7 +17,7 @@ import lombok.Setter;
 public class Company extends BaseEntity {
     private String name;
     private BigDecimal budget;
-    @OneToMany (mappedBy = "company", fetch=FetchType.LAZY)
+    @OneToMany (mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.LAZY)
     private List<Employee> employees;
     
     

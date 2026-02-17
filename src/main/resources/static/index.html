@@ -64,8 +64,8 @@
 
 <h2>Add Company</h2>
 <form id="companyForm">
-    <input type="text" id="name" placeholder="Company Name" required />
-    <input type="number" id="budget" placeholder="Budget" required />
+    <input type="text" id="name" placeholder="Company Name" />
+    <input type="number" id="budget" placeholder="Budget" />
     <button type="submit">Save</button>
 </form>
 
@@ -143,10 +143,8 @@ document.getElementById("companyForm").addEventListener("submit", function(e) {
 });
 
 function editCompany(id, currentName, currentBudget) {
-    const newName = prompt("New name:", currentName);
-    const newBudget = prompt("New budget:", currentBudget);
-
-    if (!newName || !newBudget) return;
+    const newName = currentName + " Updated";
+    const newBudget = currentBudget;
 
     fetch(`${API_URL}/${id}`, {
         method: "PUT",
