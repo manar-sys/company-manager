@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,8 @@ public class CompanyController {
 
     private final CompanyService companyService;
 
-    // CREATE
+    // 🔐 CREATE - ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<CompanyDTO> create(
             @Valid @RequestBody CompanyDTO companyDTO) {
@@ -40,13 +42,13 @@ public class CompanyController {
         );
     }
 
-    // N+1 problem test
+    // 🔓 Public test endpoint
     @GetMapping("/n-plus-one-test")
     public List<Company> getAllWithProblem() {
         return companyService.getAllStandard();
     }
 
-    // Optimized list
+    // 🔓 Public optimized list
     @GetMapping("/optimized")
     public ResponseEntity<List<CompanyDTO>> getCompaniesOptimized() {
         return ResponseEntity.ok(
@@ -54,7 +56,8 @@ public class CompanyController {
         );
     }
 
-    // UPDATE
+    // 🔐 UPDATE - ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<CompanyDTO> updateCompany(
             @PathVariable Long id,
@@ -63,14 +66,15 @@ public class CompanyController {
         return ResponseEntity.ok(companyService.updateCompany(id, dto));
     }
 
-    // DELETE
+    // 🔐 DELETE - ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCompany(@PathVariable Long id) {
         companyService.deleteCompany(id);
         return ResponseEntity.noContent().build();
     }
 
-    // PAGINATION + SORTING
+    // 🔓 PAGINATION + SORTING (public)
     @GetMapping
     public ResponseEntity<Page<CompanyDTO>> listCompanies(
             @RequestParam(defaultValue = "0") int page,

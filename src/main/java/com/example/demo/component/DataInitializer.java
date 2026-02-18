@@ -20,6 +20,7 @@ public class DataInitializer {
     @PostConstruct
     public void init() {
 
+        // Create ADMIN if not exists
         if (userRepository.findByUsername("admin").isEmpty()) {
 
             User admin = User.builder()
@@ -29,8 +30,20 @@ public class DataInitializer {
                     .build();
 
             userRepository.save(admin);
-
             System.out.println("Admin user created!");
+        }
+
+        // Create USER if not exists
+        if (userRepository.findByUsername("user").isEmpty()) {
+
+            User user = User.builder()
+                    .username("user")
+                    .password(passwordEncoder.encode("1234"))
+                    .role(Role.USER)
+                    .build();
+
+            userRepository.save(user);
+            System.out.println("Normal user created!");
         }
     }
 }

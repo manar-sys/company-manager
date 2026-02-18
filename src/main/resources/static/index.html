@@ -54,18 +54,33 @@
             color: red;
             margin-bottom: 15px;
         }
+
+        .login-box {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: white;
+            width: 400px;
+        }
     </style>
 </head>
 <body>
 
 <h1>Company Manager</h1>
 
+<div class="login-box">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <button onclick="logout()">Logout</button>
+</div>
+
 <div id="error" class="error"></div>
 
-<h2>Add Company</h2>
+<h2>Add / Edit Company (ADMIN only)</h2>
 <form id="companyForm">
-    <input type="text" id="name" placeholder="Company Name" />
-    <input type="number" id="budget" placeholder="Budget" />
+    <input type="text" id="name" placeholder="Company Name" required />
+    <input type="number" id="budget" placeholder="Budget" required />
     <button type="submit">Save</button>
 </form>
 
@@ -83,8 +98,13 @@
 </table>
 
 <script>
+
 let editingId = null;
-const API_URL = "http://localhost:8080/companies";
+const API_URL = "/companies";
+
+function getToken() {
+    return localStorage.getItem("jwt");
+}
 
 function showError(message) {
     document.getElementById("error").innerText = message;
@@ -92,6 +112,32 @@ function showError(message) {
 
 function clearError() {
     document.getElementById("error").innerText = "";
+}
+
+function login() {
+
+    fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value
+        })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Login failed");
+        return res.json();
+    })
+    .then(data => {
+        localStorage.setItem("jwt", data.token);
+        alert("Login successful!");
+    })
+    .catch(err => showError(err.message));
+}
+
+function logout() {
+    localStorage.removeItem("jwt");
+    alert("Logged out");
 }
 
 function loadCompanies() {
@@ -131,11 +177,16 @@ document.getElementById("companyForm").addEventListener("submit", function(e) {
 
     fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + getToken()
+        },
         body: JSON.stringify({ name, budget })
     })
     .then(res => {
-        if (!res.ok) throw new Error();
+        if (res.status === 401) throw new Error("Unauthorized (401)");
+        if (res.status === 403) throw new Error("Forbidden (403)");
+        if (!res.ok) throw new Error("Server error");
         return res.json();
     })
     .then(() => {
@@ -143,7 +194,7 @@ document.getElementById("companyForm").addEventListener("submit", function(e) {
         document.getElementById("companyForm").reset();
         editingId = null;
     })
-    .catch(() => showError("Validation or server error"));
+    .catch(err => showError(err.message));
 });
 
 function editCompany(id, currentName, currentBudget) {
@@ -153,12 +204,19 @@ function editCompany(id, currentName, currentBudget) {
 }
 
 function deleteCompany(id) {
-    fetch(`${API_URL}/${id}`, { method: "DELETE" })
-        .then(res => {
-            if (!res.ok) throw new Error();
-            loadCompanies();
-        })
-        .catch(() => showError("Delete failed"));
+    fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": "Bearer " + getToken()
+        }
+    })
+    .then(res => {
+        if (res.status === 401) throw new Error("Unauthorized (401)");
+        if (res.status === 403) throw new Error("Forbidden (403)");
+        if (!res.ok) throw new Error("Delete failed");
+        loadCompanies();
+    })
+    .catch(err => showError(err.message));
 }
 
 loadCompanies();
