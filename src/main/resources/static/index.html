@@ -79,8 +79,8 @@
 
 <h2>Add / Edit Company (ADMIN only)</h2>
 <form id="companyForm">
-    <input type="text" id="name" placeholder="Company Name" required />
-    <input type="number" id="budget" placeholder="Budget" required />
+    <input type="text" id="name" placeholder="Company Name" />
+    <input type="number" id="budget" placeholder="Budget" />
     <button type="submit">Save</button>
 </form>
 
@@ -107,7 +107,8 @@ function getToken() {
 }
 
 function showError(message) {
-    document.getElementById("error").innerText = message;
+    const errorDiv = document.getElementById("error");
+    errorDiv.innerText = message;
 }
 
 function clearError() {
@@ -115,6 +116,8 @@ function clearError() {
 }
 
 function login() {
+
+    clearError();
 
     fetch("/auth/login", {
         method: "POST",
@@ -169,8 +172,19 @@ document.getElementById("companyForm").addEventListener("submit", function(e) {
     e.preventDefault();
     clearError();
 
-    const name = document.getElementById("name").value;
+    const name = document.getElementById("name").value.trim();
     const budget = document.getElementById("budget").value;
+
+    // ✅ JS Validation (important for Playwright test)
+    if (!name) {
+        showError("Name is required");
+        return;
+    }
+
+    if (!getToken()) {
+        showError("Unauthorized (401)");
+        return;
+    }
 
     const method = editingId ? "PUT" : "POST";
     const url = editingId ? `${API_URL}/${editingId}` : API_URL;
@@ -204,6 +218,12 @@ function editCompany(id, currentName, currentBudget) {
 }
 
 function deleteCompany(id) {
+
+    if (!getToken()) {
+        showError("Unauthorized (401)");
+        return;
+    }
+
     fetch(`${API_URL}/${id}`, {
         method: "DELETE",
         headers: {
