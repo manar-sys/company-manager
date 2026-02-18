@@ -77,6 +77,28 @@ mvn spring-boot:run -Dspring-boot.run.profiles=test
 
 ---
 
+## Docker ile Çalıştırma
+
+Uygulamayı ve veritabanını tek komutla ayağa kaldırmak için:
+
+```bash
+docker compose up --build
+```
+
+Arka planda çalıştırmak için:
+
+```bash
+docker compose up -d --build
+```
+
+Durdurmak için:
+
+```bash
+docker compose down
+```
+
+---
+
 ## GitHub Actions (CI)
 
 Push veya pull request sonrası:
