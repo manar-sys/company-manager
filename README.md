@@ -1,121 +1,93 @@
-# Company Manager – Spring Boot + Playwright E2E
+# Company Manager – Spring Boot + Security + Flyway + Testcontainers + Docker
 
-Bu proje mevcut Spring Boot backend’in üzerine basit bir frontend eklenerek uçtan uca (E2E) test edilmesi amacıyla hazırlanmıştır.
+Bu proje, gerçek işe daha yakın bir backend geliştirme akışını göstermek için hazırlanmıştır.
 
----
-
-## Backend
-
-### Kullanılan Teknolojiler
-
+## Teknolojiler
 - Spring Boot
+- Spring Security (JWT + Role-based authorization)
 - Spring Data JPA
-- MySQL (dev profili)
-- H2 (test profili)
-- Bean Validation (@Valid)
-- Global Exception Handling (@ControllerAdvice)
+- Flyway
+- MySQL (dev ve docker)
+- H2 (test profile)
+- Testcontainers (integration test)
+- Playwright (E2E)
 
-### Özellikler
+## API ve Security
+- Login endpoint: `POST /auth/login`
+- Roller: `ADMIN`, `USER`
+- Yetki kuralları:
+- `GET /companies/**` erişilebilir
+- `POST /companies`, `PUT /companies/{id}`, `DELETE /companies/{id}` sadece `ADMIN`
+- Token yoksa `401`
+- Rol yetersizse `403`
 
-- Company CRUD endpointleri
-- DTO + Validation
-- Standart hata response yapısı
-- Liste endpointinde pagination ve sorting desteği
+## Company Endpointleri
+- Listeleme (pagination/sorting):  
+`GET /companies?page=0&size=5&sortBy=id`
+- Create: `POST /companies`
+- Update: `PUT /companies/{id}`
+- Delete: `DELETE /companies/{id}`
 
-Örnek:
+## Database Migration (Flyway)
+- Şema migration dosyalarıyla otomatik oluşturulur.
+- Migration dosyası: `src/main/resources/db/migration/V1__init_schema.sql`
+- Uygulama açılırken Flyway migration çalışır.
 
-```http
-GET /api/companies?page=0&size=5&sort=name,asc
+## Integration Test (Testcontainers)
+- Testlerde MySQL container otomatik ayağa kalkar.
+- Test sınıfı: `src/test/java/com/example/demo/CompanySecurityIntegrationTest.java`
+- Kapsanan senaryolar:
+1. ADMIN token ile create/update/delete başarılı
+2. USER delete denemesinde `403`
+3. Token olmadan `401`
+
+Çalıştırmak için:
+```bash
+./mvnw -Dtest=CompanySecurityIntegrationTest test
 ```
 
----
+## Frontend ve E2E
+Basit HTML + JavaScript arayüzü bulunur ve Playwright ile test edilir.
 
-## Frontend
-
-Basit bir HTML + JavaScript arayüzü:
-
-- Company listesi
-- Yeni company ekleme formu
-- Güncelleme (form edit mode)
-- Silme işlemi
-- API validation hatalarının ekranda gösterilmesi
-
-Not: `prompt()` yerine form-based edit kullanıldı. Bu tercih E2E testlerin daha stabil çalışması için yapıldı.
-
----
-
-## Playwright E2E Testleri
-
-Test senaryoları:
-
-1. create → listede gör → update → delete
-2. validation hatası (boş isim)
-
-Testleri çalıştırmak için:
-
+E2E testlerini çalıştırmak için:
 ```bash
 cd e2e
 npm install
 npx playwright test
 ```
 
----
-
 ## Profiller
-
-### Dev Profili (MySQL)
-
+Dev (MySQL):
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-### Test Profili (H2 – CI için)
-
+Test (H2):
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=test
 ```
 
----
-
 ## Docker ile Çalıştırma
-
-Uygulamayı ve veritabanını tek komutla ayağa kaldırmak için:
-
+App + DB tek komutla:
 ```bash
 docker compose up --build
 ```
 
-Arka planda çalıştırmak için:
-
+Arka plan:
 ```bash
 docker compose up -d --build
 ```
 
-Durdurmak için:
-
+Durdurma:
 ```bash
 docker compose down
 ```
 
----
+Kontrol:
+```bash
+docker compose ps
+docker compose logs -f app
+```
 
-## GitHub Actions (CI)
-
-Push veya pull request sonrası:
-
-- Backend build edilir
-- Test profili ile Spring Boot başlatılır
-- Playwright testleri otomatik çalıştırılır
-
-Bu sayede uçtan uca akış sürekli doğrulanır.
-
----
-
-## Neden Bu Yapı?
-
-- Dev ve test ortamlarını ayırmak için Spring Profiles kullanıldı.
-- CI ortamında dış bağımlılıkları azaltmak için H2 tercih edildi.
-- E2E testlerin stabil olması için frontend edit akışı yeniden düzenlendi.
-- Conventional Commits kullanılarak değişiklik geçmişi düzenli tutuldu.
-
-Bu yapı gerçek projelerde kullanılan profesyonel geliştirme akışına uygun şekilde tasarlanmıştır.
+## CI (GitHub Actions)
+Push/PR sonrası backend build edilir, test profile ile app başlatılır ve Playwright testleri çalıştırılır.
