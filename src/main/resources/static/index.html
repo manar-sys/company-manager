@@ -1,247 +1,774 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Company Manager</title>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
     <style>
+        :root {
+            --bg: #f4efe6;
+            --surface: #fffdf8;
+            --surface-strong: #fff8ef;
+            --ink: #1f2a30;
+            --muted: #6e7b82;
+            --brand: #0e8a7e;
+            --brand-strong: #0a6a61;
+            --danger: #bb2f36;
+            --line: #d8cdc0;
+            --shadow: 0 14px 30px rgba(31, 42, 48, 0.11);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f5f5f5;
+            margin: 0;
+            font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 0% 0%, rgba(14, 138, 126, 0.19), transparent 40%),
+                radial-gradient(circle at 100% 20%, rgba(225, 146, 77, 0.19), transparent 35%),
+                var(--bg);
+            min-height: 100vh;
         }
 
-        h1, h2 {
-            margin-bottom: 15px;
+        .app-shell {
+            width: min(1080px, 100% - 28px);
+            margin: 24px auto 48px;
         }
 
-        form {
-            margin-bottom: 30px;
+        .hero {
+            padding: 22px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, #0d5f5a, #158f80);
+            color: #effaf6;
+            box-shadow: var(--shadow);
+            margin-bottom: 18px;
         }
 
-        input {
-            padding: 8px;
-            margin-right: 10px;
-            width: 180px;
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(1.4rem, 3.8vw, 2rem);
+        }
+
+        .hero p {
+            margin: 10px 0 0;
+            color: #d5efe8;
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+
+        .card h2 {
+            margin: 0 0 14px;
+            font-size: 1.05rem;
+        }
+
+        .center-wrap {
+            min-height: 64vh;
+            display: grid;
+            align-items: center;
+            justify-items: center;
+        }
+
+        .login-card {
+            width: min(520px, 100%);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .grid-2 {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: 1fr;
+        }
+
+        label {
+            display: block;
+            font-size: 0.86rem;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            border: 1px solid #cdbfae;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font: inherit;
+            background: #fff;
+        }
+
+        .actions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
         }
 
         button {
-            padding: 8px 12px;
+            font: inherit;
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 13px;
+            font-weight: 600;
             cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.2s ease;
+        }
+
+        button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--brand);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--brand-strong);
+        }
+
+        .btn-soft {
+            background: #f0e8dc;
+            color: #55473f;
+        }
+
+        .btn-danger {
+            background: #ffe6e4;
+            color: var(--danger);
+        }
+
+        .topbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .route-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .route-chip {
+            border: 1px solid #d4c7b7;
+            background: #fff;
+            color: #5e4f46;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 0.86rem;
+        }
+
+        .route-chip.active {
+            border-color: #8dc8bf;
+            background: #eaf8f5;
+            color: #0d625a;
+        }
+
+        .msg {
+            margin: 10px 0;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.92rem;
+        }
+
+        .msg-error {
+            background: #ffe7e7;
+            color: #8f1a1f;
+            border: 1px solid #efb8b8;
+        }
+
+        .msg-info {
+            background: #eaf8f5;
+            color: #0f6058;
+            border: 1px solid #b8e5dc;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .table-wrap {
+            overflow: auto;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            margin-top: 10px;
         }
 
         table {
-            border-collapse: collapse;
             width: 100%;
-            background: white;
+            border-collapse: collapse;
+            min-width: 560px;
+            background: var(--surface-strong);
         }
 
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
+        th,
+        td {
             text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e8ddd2;
+            vertical-align: top;
         }
 
         th {
-            background-color: #eee;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 0.88rem;
         }
 
-        .actions button {
-            margin-right: 5px;
+        td.actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .error {
-            color: red;
-            margin-bottom: 15px;
+        .pagination {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
         }
 
-        .login-box {
-            margin-bottom: 30px;
-            padding: 15px;
-            background: white;
-            width: 400px;
+        @media (min-width: 920px) {
+            .layout {
+                grid-template-columns: 360px 1fr;
+                align-items: start;
+            }
         }
     </style>
 </head>
 <body>
+<div id="root"></div>
 
-<h1>Company Manager</h1>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-<div class="login-box">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <button onclick="logout()">Logout</button>
-</div>
+<script type="text/babel">
+    const { useEffect, useMemo, useState } = React;
 
-<div id="error" class="error"></div>
+    const API_URL = "/companies";
+    const ROUTES = {
+        LOGIN: "#/login",
+        COMPANIES: "#/companies"
+    };
 
-<h2>Add / Edit Company (ADMIN only)</h2>
-<form id="companyForm">
-    <input type="text" id="name" placeholder="Company Name" />
-    <input type="number" id="budget" placeholder="Budget" />
-    <button type="submit">Save</button>
-</form>
-
-<h2>Company List</h2>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Budget</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="companyTable"></tbody>
-</table>
-
-<script>
-
-let editingId = null;
-const API_URL = "/companies";
-
-function getToken() {
-    return localStorage.getItem("jwt");
-}
-
-function showError(message) {
-    const errorDiv = document.getElementById("error");
-    errorDiv.innerText = message;
-}
-
-function clearError() {
-    document.getElementById("error").innerText = "";
-}
-
-function login() {
-
-    clearError();
-
-    fetch("/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            username: document.getElementById("username").value,
-            password: document.getElementById("password").value
-        })
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Login failed");
-        return res.json();
-    })
-    .then(data => {
-        localStorage.setItem("jwt", data.token);
-        alert("Login successful!");
-    })
-    .catch(err => showError(err.message));
-}
-
-function logout() {
-    localStorage.removeItem("jwt");
-    alert("Logged out");
-}
-
-function loadCompanies() {
-    fetch(API_URL)
-        .then(res => res.json())
-        .then(data => {
-            const table = document.getElementById("companyTable");
-            table.innerHTML = "";
-
-            data.content.forEach(company => {
-                const row = `
-                    <tr>
-                        <td>${company.id}</td>
-                        <td>${company.name}</td>
-                        <td>${company.budget}</td>
-                        <td class="actions">
-                            <button onclick="editCompany(${company.id}, '${company.name}', ${company.budget})">Edit</button>
-                            <button onclick="deleteCompany(${company.id})">Delete</button>
-                        </td>
-                    </tr>
-                `;
-                table.innerHTML += row;
-            });
-        })
-        .catch(() => showError("Failed to load companies"));
-}
-
-document.getElementById("companyForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    clearError();
-
-    const name = document.getElementById("name").value.trim();
-    const budget = document.getElementById("budget").value;
-
-    // ✅ JS Validation (important for Playwright test)
-    if (!name) {
-        showError("Name is required");
-        return;
+    function normalizeRoute(hash) {
+        if (hash === ROUTES.LOGIN || hash === ROUTES.COMPANIES) return hash;
+        return ROUTES.LOGIN;
     }
 
-    if (!getToken()) {
-        showError("Unauthorized (401)");
-        return;
-    }
+    async function request(url, options = {}) {
+        const res = await fetch(url, options);
 
-    const method = editingId ? "PUT" : "POST";
-    const url = editingId ? `${API_URL}/${editingId}` : API_URL;
-
-    fetch(url, {
-        method: method,
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + getToken()
-        },
-        body: JSON.stringify({ name, budget })
-    })
-    .then(res => {
         if (res.status === 401) throw new Error("Unauthorized (401)");
         if (res.status === 403) throw new Error("Forbidden (403)");
-        if (!res.ok) throw new Error("Server error");
-        return res.json();
-    })
-    .then(() => {
-        loadCompanies();
-        document.getElementById("companyForm").reset();
-        editingId = null;
-    })
-    .catch(err => showError(err.message));
-});
 
-function editCompany(id, currentName, currentBudget) {
-    document.getElementById("name").value = currentName;
-    document.getElementById("budget").value = currentBudget;
-    editingId = id;
-}
-
-function deleteCompany(id) {
-
-    if (!getToken()) {
-        showError("Unauthorized (401)");
-        return;
-    }
-
-    fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-        headers: {
-            "Authorization": "Bearer " + getToken()
+        if (!res.ok) {
+            const body = await res.text();
+            throw new Error(body || "Server error");
         }
-    })
-    .then(res => {
-        if (res.status === 401) throw new Error("Unauthorized (401)");
-        if (res.status === 403) throw new Error("Forbidden (403)");
-        if (!res.ok) throw new Error("Delete failed");
-        loadCompanies();
-    })
-    .catch(err => showError(err.message));
-}
 
-loadCompanies();
+        if (res.status === 204) return null;
+        return res.json();
+    }
 
+    function RouteHeader({ route, isAuthenticated, onLogout }) {
+        return (
+            <div className="topbar">
+                <div className="route-tabs">
+                    <span className={`route-chip ${route === ROUTES.LOGIN ? "active" : ""}`}>Login</span>
+                    <span className={`route-chip ${route === ROUTES.COMPANIES ? "active" : ""}`}>Companies</span>
+                </div>
+                {isAuthenticated && (
+                    <button className="btn-soft" type="button" onClick={onLogout}>Logout</button>
+                )}
+            </div>
+        );
+    }
+
+    function LoginPage({ username, password, setUsername, setPassword, onLogin, busy, error, info }) {
+        return (
+            <div className="center-wrap">
+                <section className="card login-card">
+                    <h2>Login</h2>
+                    <p className="muted">Use `admin / 1234` for full CRUD permissions.</p>
+
+                    <div className="grid-2">
+                        <div>
+                            <label htmlFor="username">Username</label>
+                            <input
+                                id="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="admin"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="password">Password</label>
+                            <input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="1234"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="actions-row">
+                        <button className="btn-primary" type="button" onClick={onLogin} disabled={busy}>Sign In</button>
+                    </div>
+
+                    {error && <div id="error" className="msg msg-error">{error}</div>}
+                    {!error && <div id="error" style={{ display: "none" }}></div>}
+                    {info && <div className="msg msg-info">{info}</div>}
+                </section>
+            </div>
+        );
+    }
+
+    function CompaniesPage({
+        companies,
+        totalPages,
+        totalItems,
+        page,
+        setPage,
+        size,
+        setSize,
+        sortBy,
+        setSortBy,
+        name,
+        setName,
+        budget,
+        setBudget,
+        editingId,
+        onSave,
+        onClear,
+        onEdit,
+        onDelete,
+        busy,
+        error,
+        info
+    }) {
+        return (
+            <section className="layout">
+                <div className="card">
+                    <h2>{editingId ? "Edit Company" : "Add Company"}</h2>
+                    <form id="companyForm" onSubmit={onSave}>
+                        <div className="grid-2">
+                            <div>
+                                <label htmlFor="name">Company Name</label>
+                                <input
+                                    id="name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Acme Inc"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="budget">Budget</label>
+                                <input
+                                    id="budget"
+                                    type="number"
+                                    value={budget}
+                                    onChange={(e) => setBudget(e.target.value)}
+                                    placeholder="100000"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="actions-row">
+                            <button className="btn-primary" type="submit" disabled={busy}>
+                                {editingId ? "Update" : "Save"}
+                            </button>
+                            <button className="btn-soft" type="button" onClick={onClear}>Clear</button>
+                        </div>
+                    </form>
+                    <p className="muted">Create / Update / Delete requires ADMIN token.</p>
+                </div>
+
+                <div className="card">
+                    <h2>Company List</h2>
+
+                    <div className="grid-2" style={{ gridTemplateColumns: "1fr 1fr" }}>
+                        <div>
+                            <label htmlFor="size">Rows per page</label>
+                            <select
+                                id="size"
+                                value={size}
+                                onChange={(e) => {
+                                    setPage(0);
+                                    setSize(Number(e.target.value));
+                                }}
+                            >
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="sortBy">Sort by</label>
+                            <select
+                                id="sortBy"
+                                value={sortBy}
+                                onChange={(e) => {
+                                    setPage(0);
+                                    setSortBy(e.target.value);
+                                }}
+                            >
+                                <option value="id">ID</option>
+                                <option value="name">Name</option>
+                                <option value="budget">Budget</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {error && <div id="error" className="msg msg-error">{error}</div>}
+                    {!error && <div id="error" style={{ display: "none" }}></div>}
+                    {info && <div className="msg msg-info">{info}</div>}
+
+                    <div className="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Budget</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="companyTable">
+                            {companies.length === 0 && (
+                                <tr>
+                                    <td colSpan="4" className="muted">No companies available.</td>
+                                </tr>
+                            )}
+
+                            {companies.map((company) => (
+                                <tr key={company.id}>
+                                    <td>{company.id}</td>
+                                    <td>{company.name}</td>
+                                    <td>{company.budget}</td>
+                                    <td className="actions">
+                                        <button className="btn-soft" type="button" onClick={() => onEdit(company)}>Edit</button>
+                                        <button className="btn-danger" type="button" onClick={() => onDelete(company.id)}>Delete</button>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="pagination">
+                        <button
+                            className="btn-soft"
+                            type="button"
+                            onClick={() => setPage((p) => Math.max(0, p - 1))}
+                            disabled={page === 0 || busy}
+                        >
+                            Previous
+                        </button>
+                        <button
+                            className="btn-soft"
+                            type="button"
+                            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                            disabled={page >= totalPages - 1 || busy}
+                        >
+                            Next
+                        </button>
+                        <span className="muted">Page {page + 1} / {Math.max(totalPages, 1)} · Total {totalItems}</span>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    function App() {
+        const [token, setToken] = useState(() => localStorage.getItem("jwt") || "");
+        const [route, setRoute] = useState(() => normalizeRoute(window.location.hash));
+
+        const [username, setUsername] = useState("admin");
+        const [password, setPassword] = useState("1234");
+
+        const [companies, setCompanies] = useState([]);
+        const [totalPages, setTotalPages] = useState(1);
+        const [totalItems, setTotalItems] = useState(0);
+        const [page, setPage] = useState(0);
+        const [size, setSize] = useState(5);
+        const [sortBy, setSortBy] = useState("id");
+
+        const [name, setName] = useState("");
+        const [budget, setBudget] = useState("");
+        const [editingId, setEditingId] = useState(null);
+
+        const [error, setError] = useState("");
+        const [info, setInfo] = useState("");
+        const [busy, setBusy] = useState(false);
+
+        const isAuthenticated = useMemo(() => Boolean(token), [token]);
+
+        function navigate(nextRoute) {
+            if (window.location.hash !== nextRoute) {
+                window.location.hash = nextRoute;
+            } else {
+                setRoute(nextRoute);
+            }
+        }
+
+        useEffect(() => {
+            if (!window.location.hash) {
+                navigate(isAuthenticated ? ROUTES.COMPANIES : ROUTES.LOGIN);
+            }
+        }, []);
+
+        useEffect(() => {
+            const onHashChange = () => setRoute(normalizeRoute(window.location.hash));
+            window.addEventListener("hashchange", onHashChange);
+            return () => window.removeEventListener("hashchange", onHashChange);
+        }, []);
+
+        useEffect(() => {
+            if (!isAuthenticated && route === ROUTES.COMPANIES) {
+                setError("Unauthorized (401)");
+                navigate(ROUTES.LOGIN);
+            }
+        }, [isAuthenticated, route]);
+
+        useEffect(() => {
+            if (isAuthenticated && route === ROUTES.LOGIN) {
+                navigate(ROUTES.COMPANIES);
+            }
+        }, [isAuthenticated, route]);
+
+        useEffect(() => {
+            if (route === ROUTES.COMPANIES && isAuthenticated) {
+                loadCompanies();
+            }
+        }, [route, isAuthenticated, page, size, sortBy]);
+
+        function showError(message) {
+            setInfo("");
+            setError(message);
+        }
+
+        function showInfo(message) {
+            setError("");
+            setInfo(message);
+        }
+
+        async function login() {
+            setBusy(true);
+            setError("");
+            setInfo("");
+            try {
+                const data = await request("/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+                localStorage.setItem("jwt", data.token);
+                setToken(data.token);
+                showInfo("Login successful.");
+                navigate(ROUTES.COMPANIES);
+            } catch (e) {
+                showError(e.message || "Login failed");
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("jwt");
+            setToken("");
+            setCompanies([]);
+            setPage(0);
+            setName("");
+            setBudget("");
+            setEditingId(null);
+            showInfo("Logged out.");
+            navigate(ROUTES.LOGIN);
+        }
+
+        async function loadCompanies() {
+            try {
+                const data = await request(`${API_URL}?page=${page}&size=${size}&sortBy=${sortBy}`);
+                setCompanies(data.content || []);
+                setTotalPages(data.totalPages || 1);
+                setTotalItems(data.totalElements || 0);
+            } catch (e) {
+                showError("Failed to load companies");
+            }
+        }
+
+        function beginEdit(company) {
+            setEditingId(company.id);
+            setName(company.name);
+            setBudget(String(company.budget ?? ""));
+            showInfo(`Editing company #${company.id}`);
+        }
+
+        function clearForm() {
+            setEditingId(null);
+            setName("");
+            setBudget("");
+            setError("");
+            setInfo("");
+        }
+
+        async function saveCompany(event) {
+            event.preventDefault();
+            setError("");
+            setInfo("");
+
+            if (!name.trim()) {
+                showError("Name is required");
+                return;
+            }
+
+            if (!isAuthenticated) {
+                showError("Unauthorized (401)");
+                return;
+            }
+
+            setBusy(true);
+
+            try {
+                const isEdit = Boolean(editingId);
+                const method = isEdit ? "PUT" : "POST";
+                const url = isEdit ? `${API_URL}/${editingId}` : API_URL;
+
+                await request(url, {
+                    method,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name: name.trim(),
+                        budget
+                    })
+                });
+
+                setEditingId(null);
+                setName("");
+                setBudget("");
+                showInfo(isEdit ? "Company updated." : "Company created.");
+                await loadCompanies();
+            } catch (e) {
+                showError(e.message || "Save failed");
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        async function deleteCompany(id) {
+            if (!isAuthenticated) {
+                showError("Unauthorized (401)");
+                return;
+            }
+
+            setBusy(true);
+            setError("");
+            setInfo("");
+
+            try {
+                await request(`${API_URL}/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                showInfo("Company deleted.");
+                await loadCompanies();
+            } catch (e) {
+                showError(e.message || "Delete failed");
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        return (
+            <main className="app-shell">
+                <section className="hero">
+                    <h1>Company Manager</h1>
+                    <p>React web app with separated pages, JWT auth and mobile-friendly CRUD dashboard.</p>
+                </section>
+
+                <RouteHeader route={route} isAuthenticated={isAuthenticated} onLogout={logout} />
+
+                {route === ROUTES.LOGIN && (
+                    <LoginPage
+                        username={username}
+                        password={password}
+                        setUsername={setUsername}
+                        setPassword={setPassword}
+                        onLogin={login}
+                        busy={busy}
+                        error={error}
+                        info={info}
+                    />
+                )}
+
+                {route === ROUTES.COMPANIES && isAuthenticated && (
+                    <CompaniesPage
+                        companies={companies}
+                        totalPages={totalPages}
+                        totalItems={totalItems}
+                        page={page}
+                        setPage={setPage}
+                        size={size}
+                        setSize={setSize}
+                        sortBy={sortBy}
+                        setSortBy={setSortBy}
+                        name={name}
+                        setName={setName}
+                        budget={budget}
+                        setBudget={setBudget}
+                        editingId={editingId}
+                        onSave={saveCompany}
+                        onClear={clearForm}
+                        onEdit={beginEdit}
+                        onDelete={deleteCompany}
+                        busy={busy}
+                        error={error}
+                        info={info}
+                    />
+                )}
+            </main>
+        );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
-
 </body>
 </html>

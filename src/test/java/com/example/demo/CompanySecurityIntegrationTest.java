@@ -28,6 +28,7 @@ import com.jayway.jsonpath.JsonPath;
 @ActiveProfiles("test")
 class CompanySecurityIntegrationTest {
 
+    @SuppressWarnings({"resource", "unused"}) // Used indirectly by Spring/Testcontainers
     @Container
     static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.4.0")
             .withDatabaseName("test_db")

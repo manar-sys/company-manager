@@ -46,8 +46,36 @@ Bu proje, gerçek işe daha yakın bir backend geliştirme akışını gösterme
 ./mvnw -Dtest=CompanySecurityIntegrationTest test
 ```
 
-## Frontend ve E2E
-Basit HTML + JavaScript arayüzü bulunur ve Playwright ile test edilir.
+## Frontend (React) ve E2E
+Frontend artık `frontend/` altında Vite + React ile geliştirilir.
+
+Backend'i çalıştır:
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=test
+```
+
+Frontend'i çalıştır:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Uygulama:
+- React web: `http://localhost:5173/#/login`
+- Backend API: `http://localhost:8080`
+
+Not:
+- Vite proxy ayarı sayesinde `/auth` ve `/companies` çağrıları otomatik backend'e gider.
+- Login için seed kullanıcıları: `admin/1234` ve `user/1234`.
+- Backend içinden static olarak servis etmek için:
+```bash
+cd frontend
+npm run build:backend
+```
+sonra `http://localhost:8080/react/index.html#/login` açılabilir.
+
+E2E tarafında legacy static ekran (`src/main/resources/static/index.html`) kullanılmaya devam edebilir.
 
 E2E testlerini çalıştırmak için:
 ```bash
